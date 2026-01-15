@@ -68,28 +68,56 @@ class QuizGUI:
         self.root = root
         self.game = game
         self.player_name = ""
+        self.bg_color = "white"  # default light mode
 
         self.root.title("Valorant Agent Quiz")
         self.root.geometry("600x400")
+        self.root.config(bg=self.bg_color)
 
         # Welcome frame
-        self.welcome_frame = tk.Frame(self.root)
+        self.welcome_frame = tk.Frame(self.root, bg=self.bg_color)
         self.welcome_frame.pack(pady=50)
 
-        tk.Label(self.welcome_frame, text="Enter your player name:", font=("Arial", 14)).pack(pady=10)
+        tk.Label(self.welcome_frame, text="Enter your player name:", font=("Arial", 14), bg=self.bg_color).pack(pady=10)
         self.name_entry = tk.Entry(self.welcome_frame, font=("Arial", 14))
         self.name_entry.pack(pady=10)
         tk.Button(self.welcome_frame, text="Start Quiz", font=("Arial", 14), command=self.start_quiz).pack(pady=10)
+        tk.Button(self.welcome_frame, text="Toggle Dark/Light Mode", font=("Arial", 10),
+                  command=self.toggle_theme).pack(pady=5)
 
         # Quiz frame
-        self.quiz_frame = tk.Frame(self.root)
-        self.question_label = tk.Label(self.quiz_frame, text="", font=("Arial", 14), wraplength=500)
+        self.quiz_frame = tk.Frame(self.root, bg=self.bg_color)
+        self.question_label = tk.Label(self.quiz_frame, text="", font=("Arial", 14), wraplength=500, bg=self.bg_color)
         self.question_label.pack(pady=20)
         self.answer_entry = tk.Entry(self.quiz_frame, font=("Arial", 14))
         self.answer_entry.pack(pady=10)
         self.submit_button = tk.Button(self.quiz_frame, text="Submit", font=("Arial", 14), command=self.submit_answer)
         self.submit_button.pack(pady=10)
+        self.toggle_button = tk.Button(self.quiz_frame, text="Toggle Dark/Light Mode", font=("Arial", 10),
+                                       command=self.toggle_theme)
+        self.toggle_button.pack(pady=5)
 
+    # ===== Theme Toggle =====
+    def toggle_theme(self):
+        if self.bg_color == "white":
+            self.bg_color = "black"
+            fg_color = "white"
+        else:
+            self.bg_color = "white"
+            fg_color = "black"
+
+        self.root.config(bg=self.bg_color)
+        self.welcome_frame.config(bg=self.bg_color)
+        self.quiz_frame.config(bg=self.bg_color)
+
+        for widget in self.welcome_frame.winfo_children():
+            widget.config(bg=self.bg_color, fg=fg_color)
+
+        for widget in self.quiz_frame.winfo_children():
+            if isinstance(widget, tk.Label) or isinstance(widget, tk.Button):
+                widget.config(bg=self.bg_color, fg=fg_color)
+
+    # ===== Quiz Methods =====
     def start_quiz(self):
         name = self.name_entry.get().strip()
         if not name:
