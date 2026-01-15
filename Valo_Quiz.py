@@ -179,13 +179,32 @@ class QuizGUI:
 
 # ===== AGENTS DATA WITH IMAGE PATHS =====
 agents_data = [
-    Agent("Brimstone", "Controller", "USA", ["Incendiary", "Stim Beacon", "Sky Smoke", "Orbital Strike"], "images/brimstone.png"),
-    Agent("Phoenix", "Duelist", "UK", ["Curveball", "Hot Hands", "Blaze", "Run It Back"], "images/phoenix.png"),
-    Agent("Sage", "Sentinel", "China", ["Barrier Orb", "Slow Orb", "Healing Orb", "Resurrection"], "images/sage.png"),
-    Agent("Sova", "Initiator", "Russia", ["Owl Drone", "Shock Bolt", "Recon Bolt", "Hunter's Fury"], "images/sova.png"),
-    Agent("Viper", "Controller", "USA", ["Snake Bite", "Poison Cloud", "Toxic Screen", "Viper's Pit"], "images/viper.png"),
-    # Add remaining agents with images here...
+    Agent("Brimstone", "Controller", "USA", ["Incendiary", "Stim Beacon", "Sky Smoke", "Orbital Strike"], "images/Brimstone.jpeg"),
+    Agent("Phoenix", "Duelist", "UK", ["Curveball", "Hot Hands", "Blaze", "Run It Back"], "images/Phoenix.jpeg"),
+    Agent("Sage", "Sentinel", "China", ["Barrier Orb", "Slow Orb", "Healing Orb", "Resurrection"], "images/Sage.jpeg"),
+    Agent("Sova", "Initiator", "Russia", ["Owl Drone", "Shock Bolt", "Recon Bolt", "Hunter's Fury"], "images/Sova.jpeg"),
+    Agent("Viper", "Controller", "USA", ["Snake Bite", "Poison Cloud", "Toxic Screen", "Viper's Pit"], "images/Viper.jpeg"),
+    Agent("Cypher", "Sentinel", "Morocco", ["Trapwire", "Cyber Cage", "Spycam", "Neural Theft"], "images/Cypher.jpeg"),
+    Agent("Reyna", "Duelist", "Mexico", ["Leer", "Devour", "Dismiss", "Empress"], "images/Reyna.jpeg"),
+    Agent("Killjoy", "Sentinel", "Germany", ["Alarmbot", "Nanoswarm", "Turret", "Lockdown"], "images/Killjoy.jpeg"),
+    Agent("Breach", "Initiator", "Sweden", ["Aftershock", "Flashpoint", "Fault Line", "Rolling Thunder"], "images/Breach.jpeg"),
+    Agent("Omen", "Controller", "Unknown", ["Shrouded Step", "Paranoia", "Dark Cover", "From the Shadows"], "images/Omen.jpeg"),
+    Agent("Jett", "Duelist", "South Korea", ["Cloudburst", "Updraft", "Tailwind", "Blade Storm"], "images/Jett.jpeg"),
+    Agent("Raze", "Duelist", "Brazil", ["Boom Bot", "Paint Shells", "Blast Pack", "Showstopper"], "images/Raze.jpeg"),
+    Agent("Skye", "Initiator", "Australia", ["Regrowth", "Trailblazer", "Guiding Light", "Seekers"], "images/Skye.jpeg"),
+    Agent("Yoru", "Duelist", "Japan", ["Fakeout", "Blindside", "Gatecrash", "Dimensional Drift"], "images/Yoru.jpeg"),
+    Agent("Astra", "Controller", "Ghana" , ["Gravity Well" , "Nova Pulse" , "Nebula" , "Astral Form"] , "images/Astra.jpeg"),
+    Agent("KAY/O" , "Initiator" , "Unknown (robot)" , ["FRAG/ment" ,"FLASH/drive" , "ZERO/point" , "NULL/cmd"] , "images/KAY:O.jpeg"),
+    Agent("Chamber" , "Sentinel" , "France" , 	["Trademark" , 	"Headhunter" , 	["Rendezvous"] , ["Tour De Force"]], "images/Chamber.jpeg"),
+    Agent("Neon", "Duelist", "Philippines", ["Fast Lane", "Relay Bolt", "High Gear", "Overdrive"], "images/Neon.jpeg"),
+    Agent("Fade", "Initiator", "Turkey", ["Prowler", "Seize", "Haunt", "Nightfall"], "images/Fade.jpeg"),
+    Agent("Harbor", "Controller", "India", ["Cove", "High Tide", "Cascade", "Reckoning"], "images/Harbor.jpeg"),
+    Agent("Gekko", "Initiator", "USA", ["Dizzy", "Wingman", "Mosh Pit", "Thrash"], "images/Gekko.jpeg"),
+    Agent("Deadlock", "Sentinel", "Norway", ["GravNet", "Sonic Sensor", "Barrier Mesh", "Annihilation"], "images/Deadlock.jpeg"),
+    Agent("Iso", "Duelist", "China", ["Undercut", "Double Tap", "Kill Contract"], "images/Iso.jpeg"),
+    Agent("Clove", "Controller", "Scotland", ["Pick-Me-Up", "Ruse", "Meddle" , 	"Not Dead Yet"] , 	"images/Clove.jpeg"),
 ]
+
 
 # ===== RUN APP =====
 if __name__ == "__main__":
