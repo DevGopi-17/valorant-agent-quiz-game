@@ -1,14 +1,17 @@
 import tkinter as tk
 from tkinter import messagebox
+from PIL import Image, ImageTk  # pip install pillow
 import random
+import os
 
 # ===== AGENT CLASS =====
 class Agent:
-    def __init__(self, name, role, origin, abilities):
+    def __init__(self, name, role, origin, abilities, image_path):
         self.name = name
         self.role = role
         self.origin = origin
         self.abilities = abilities
+        self.image_path = image_path
 
 
 # ===== QUIZ GAME CLASS =====
@@ -18,6 +21,7 @@ class QuizGame:
         self.questions = []
         self.score = 0
         self.current_question = 0
+        self.options = []
 
     def generate_questions(self):
         questions = []
@@ -26,33 +30,31 @@ class QuizGame:
             # Role question
             questions.append({
                 "question": f"What is {agent.name}'s role?",
-                "answer": agent.role
+                "answer": agent.role,
+                "agent": agent
             })
             # Origin question
             questions.append({
                 "question": f"Which country is {agent.name} from?",
-                "answer": agent.origin
+                "answer": agent.origin,
+                "agent": agent
             })
             # Ability question
             ability = random.choice(agent.abilities)
             questions.append({
                 "question": f"Which agent has the ability '{ability}'?",
-                "answer": agent.name
+                "answer": agent.name,
+                "agent": agent
             })
 
         random.shuffle(questions)
-        self.questions = questions[:10]  # Only 10 questions
-
-    def check_answer(self, answer):
-        correct = answer.lower() == self.questions[self.current_question]['answer'].lower()
-        if correct:
-            self.score += 1
-        return correct
+        self.questions = questions[:10]
 
     def next_question(self):
-        self.current_question += 1
         if self.current_question < len(self.questions):
-            return self.questions[self.current_question]['question']
+            q = self.questions[self.current_question]
+            self.current_question += 1
+            return q
         else:
             return None
 
@@ -62,141 +64,127 @@ class QuizGame:
         self.generate_questions()
 
 
-# ===== GUI =====
+# ===== GUI CLASS =====
 class QuizGUI:
     def __init__(self, root, game):
         self.root = root
         self.game = game
-        self.player_name = ""
-        self.bg_color = "white"  # default light mode
-
         self.root.title("Valorant Agent Quiz")
-        self.root.geometry("600x400")
-        self.root.config(bg=self.bg_color)
+        self.root.geometry("800x600")
+        self.root.config(bg="#1E1E1E")  # Dark theme
+        self.current_q = None
+        self.agent_image_label = None
+
+        # Fonts and colors
+        self.title_font = ("Verdana", 20, "bold")
+        self.question_font = ("Arial", 16)
+        self.button_font = ("Arial", 14)
+        self.bg_color = "#1E1E1E"
+        self.button_color = "#FF4655"  # Valorant red
+        self.button_hover = "#FF7F7F"
 
         # Welcome frame
         self.welcome_frame = tk.Frame(self.root, bg=self.bg_color)
         self.welcome_frame.pack(pady=50)
-
-        tk.Label(self.welcome_frame, text="Enter your player name:", font=("Arial", 14), bg=self.bg_color).pack(pady=10)
-        self.name_entry = tk.Entry(self.welcome_frame, font=("Arial", 14))
+        tk.Label(self.welcome_frame, text="Valorant Agent Quiz", font=self.title_font, fg="white", bg=self.bg_color).pack(pady=20)
+        tk.Label(self.welcome_frame, text="Enter your player name:", font=self.question_font, fg="white", bg=self.bg_color).pack(pady=10)
+        self.name_entry = tk.Entry(self.welcome_frame, font=self.question_font)
         self.name_entry.pack(pady=10)
-        tk.Button(self.welcome_frame, text="Start Quiz", font=("Arial", 14), command=self.start_quiz).pack(pady=10)
-        tk.Button(self.welcome_frame, text="Toggle Dark/Light Mode", font=("Arial", 10),
-                  command=self.toggle_theme).pack(pady=5)
+        tk.Button(self.welcome_frame, text="Start Quiz", font=self.button_font, bg=self.button_color, fg="white", command=self.start_quiz).pack(pady=10)
 
         # Quiz frame
         self.quiz_frame = tk.Frame(self.root, bg=self.bg_color)
-        self.question_label = tk.Label(self.quiz_frame, text="", font=("Arial", 14), wraplength=500, bg=self.bg_color)
+
+        self.question_label = tk.Label(self.quiz_frame, text="", font=self.question_font, fg="white", bg=self.bg_color, wraplength=700)
         self.question_label.pack(pady=20)
-        self.answer_entry = tk.Entry(self.quiz_frame, font=("Arial", 14))
-        self.answer_entry.pack(pady=10)
-        self.submit_button = tk.Button(self.quiz_frame, text="Submit", font=("Arial", 14), command=self.submit_answer)
-        self.submit_button.pack(pady=10)
-        self.toggle_button = tk.Button(self.quiz_frame, text="Toggle Dark/Light Mode", font=("Arial", 10),
-                                       command=self.toggle_theme)
-        self.toggle_button.pack(pady=5)
 
-    # ===== Theme Toggle =====
-    def toggle_theme(self):
-        if self.bg_color == "white":
-            self.bg_color = "black"
-            fg_color = "white"
-        else:
-            self.bg_color = "white"
-            fg_color = "black"
+        self.image_canvas = tk.Label(self.quiz_frame, bg=self.bg_color)
+        self.image_canvas.pack(pady=10)
 
-        self.root.config(bg=self.bg_color)
-        self.welcome_frame.config(bg=self.bg_color)
-        self.quiz_frame.config(bg=self.bg_color)
+        self.option_buttons = []
+        for i in range(4):
+            btn = tk.Button(self.quiz_frame, text="", font=self.button_font, bg=self.button_color, fg="white",
+                            width=25, command=lambda idx=i: self.check_answer(idx))
+            btn.pack(pady=5)
+            btn.bind("<Enter>", lambda e, b=btn: b.config(bg=self.button_hover))
+            btn.bind("<Leave>", lambda e, b=btn: b.config(bg=self.button_color))
+            self.option_buttons.append(btn)
 
-        for widget in self.welcome_frame.winfo_children():
-            widget.config(bg=self.bg_color, fg=fg_color)
-
-        for widget in self.quiz_frame.winfo_children():
-            if isinstance(widget, tk.Label) or isinstance(widget, tk.Button):
-                widget.config(bg=self.bg_color, fg=fg_color)
-
-    # ===== Quiz Methods =====
+    # ===== QUIZ METHODS =====
     def start_quiz(self):
         name = self.name_entry.get().strip()
         if not name:
             messagebox.showwarning("Input Error", "Please enter your name.")
             return
-
         self.player_name = name
         self.game.reset()
-
         self.welcome_frame.pack_forget()
-        self.quiz_frame.pack(pady=50)
+        self.quiz_frame.pack(pady=20)
+        self.show_next_question()
 
-        self.show_question()
-
-    def show_question(self):
-        question = self.game.questions[self.game.current_question]['question']
-        self.question_label.config(text=f"Q{self.game.current_question + 1}: {question}")
-        self.answer_entry.delete(0, tk.END)
-
-    def submit_answer(self):
-        answer = self.answer_entry.get().strip()
-        if answer.lower() in ("quit", "exit"):
+    def show_next_question(self):
+        q = self.game.next_question()
+        if q is None:
             self.end_quiz()
             return
+        self.current_q = q
+        self.question_label.config(text=f"Q{self.game.current_question}: {q['question']}")
+        self.show_agent_image(q['agent'].image_path)
+        self.set_options(q)
 
-        correct = self.game.check_answer(answer)
-        if correct:
+    def show_agent_image(self, path):
+        if os.path.exists(path):
+            img = Image.open(path)
+            img = img.resize((200, 200), Image.ANTIALIAS)
+            self.imgtk = ImageTk.PhotoImage(img)
+            self.image_canvas.config(image=self.imgtk)
+        else:
+            self.image_canvas.config(image="", text="Image not found", fg="white", font=self.question_font)
+
+    def set_options(self, q):
+        # For multiple-choice, pick 3 random wrong options
+        answers = [q['answer']]
+        while len(answers) < 4:
+            a = random.choice(self.game.agents)
+            wrong_answer = a.name if "agent" in q and "abilities" in q else (a.role if "role" in q['question'] else a.origin)
+            if wrong_answer not in answers:
+                answers.append(wrong_answer)
+        random.shuffle(answers)
+        self.current_q['options'] = answers
+        for i, btn in enumerate(self.option_buttons):
+            btn.config(text=answers[i])
+
+    def check_answer(self, idx):
+        selected = self.current_q['options'][idx]
+        correct = self.current_q['answer']
+        if selected == correct:
+            self.game.score += 1
             messagebox.showinfo("Result", "Correct!")
         else:
-            correct_ans = self.game.questions[self.game.current_question]['answer']
-            messagebox.showinfo("Result", f"Wrong! Correct answer: {correct_ans}")
-
-        next_q = self.game.next_question()
-        if next_q:
-            self.show_question()
-        else:
-            self.end_quiz()
+            messagebox.showinfo("Result", f"Wrong! Correct answer: {correct}")
+        self.show_next_question()
 
     def end_quiz(self):
         score = self.game.score
         message = f"Quiz complete, {self.player_name}!\nYour Score: {score} / 10\n"
-
         if score >= 8:
             message += "Rank: Valorant Pro"
         elif score >= 5:
             message += "Rank: Agent Trainee"
         else:
             message += "Rank: New Recruit"
-
         messagebox.showinfo("Quiz Finished", message)
         self.root.destroy()
 
 
-# ===== AGENTS DATA =====
+# ===== AGENTS DATA WITH IMAGE PATHS =====
 agents_data = [
-    Agent("Brimstone", "Controller", "USA", ["Incendiary", "Stim Beacon", "Sky Smoke", "Orbital Strike"]),
-    Agent("Phoenix", "Duelist", "UK", ["Curveball", "Hot Hands", "Blaze", "Run It Back"]),
-    Agent("Sage", "Sentinel", "China", ["Barrier Orb", "Slow Orb", "Healing Orb", "Resurrection"]),
-    Agent("Sova", "Initiator", "Russia", ["Owl Drone", "Shock Bolt", "Recon Bolt", "Hunter's Fury"]),
-    Agent("Viper", "Controller", "USA", ["Snake Bite", "Poison Cloud", "Toxic Screen", "Viper's Pit"]),
-    Agent("Cypher", "Sentinel", "Morocco", ["Trapwire", "Cyber Cage", "Spycam", "Neural Theft"]),
-    Agent("Reyna", "Duelist", "Mexico", ["Leer", "Devour", "Dismiss", "Empress"]),
-    Agent("Killjoy", "Sentinel", "Germany", ["Alarmbot", "Nanoswarm", "Turret", "Lockdown"]),
-    Agent("Breach", "Initiator", "Sweden", ["Aftershock", "Flashpoint", "Fault Line", "Rolling Thunder"]),
-    Agent("Omen", "Controller", "Unknown", ["Shrouded Step", "Paranoia", "Dark Cover", "From the Shadows"]),
-    Agent("Jett", "Duelist", "South Korea", ["Cloudburst", "Updraft", "Tailwind", "Blade Storm"]),
-    Agent("Raze", "Duelist", "Brazil", ["Boom Bot", "Paint Shells", "Blast Pack", "Showstopper"]),
-    Agent("Skye", "Initiator", "Australia", ["Regrowth", "Trailblazer", "Guiding Light", "Seekers"]),
-    Agent("Yoru", "Duelist", "Japan", ["Fakeout", "Blindside", "Gatecrash", "Dimensional Drift"]),
-    Agent("Astra", "Controller", "Ghana", ["Gravity Well", "Nova Pulse", "Nebula", "Astral Form"]),
-    Agent("KAY/O", "Initiator", "Unknown (robot)", ["FRAG/ment", "FLASH/drive", "ZERO/point", "NULL/cmd"]),
-    Agent("Chamber", "Sentinel", "France", ["Trademark", "Headhunter", "Rendezvous", "Tour De Force"]),
-    Agent("Neon", "Duelist", "Philippines", ["Fast Lane", "Relay Bolt", "High Gear", "Overdrive"]),
-    Agent("Fade", "Initiator", "Turkey", ["Prowler", "Seize", "Haunt", "Nightfall"]),
-    Agent("Harbor", "Controller", "India", ["Cove", "High Tide", "Cascade", "Reckoning"]),
-    Agent("Gekko", "Initiator", "USA", ["Dizzy", "Wingman", "Mosh Pit", "Thrash"]),
-    Agent("Deadlock", "Sentinel", "Norway", ["GravNet", "Sonic Sensor", "Barrier Mesh", "Annihilation"]),
-    Agent("Iso", "Duelist", "China", ["Undercut", "Double Tap", "Kill Contract"]),
-    Agent("Clove", "Controller", "Scotland", ["Pick-Me-Up", "Ruse", "Meddle", "Not Dead Yet"])
+    Agent("Brimstone", "Controller", "USA", ["Incendiary", "Stim Beacon", "Sky Smoke", "Orbital Strike"], "images/brimstone.png"),
+    Agent("Phoenix", "Duelist", "UK", ["Curveball", "Hot Hands", "Blaze", "Run It Back"], "images/phoenix.png"),
+    Agent("Sage", "Sentinel", "China", ["Barrier Orb", "Slow Orb", "Healing Orb", "Resurrection"], "images/sage.png"),
+    Agent("Sova", "Initiator", "Russia", ["Owl Drone", "Shock Bolt", "Recon Bolt", "Hunter's Fury"], "images/sova.png"),
+    Agent("Viper", "Controller", "USA", ["Snake Bite", "Poison Cloud", "Toxic Screen", "Viper's Pit"], "images/viper.png"),
+    # Add remaining agents with images here...
 ]
 
 # ===== RUN APP =====
