@@ -198,6 +198,7 @@ agents_data = [
     Agent("Clove", "Controller", "Scotland", ["Pick-Me-Up", "Ruse", "Meddle", "Not Dead Yet"])
 ]
 
+
 #RUN APP 
 if __name__ == "__main__":
     root = tk.Tk()
