@@ -3,7 +3,7 @@ from tkinter import messagebox
 from tkinter import ttk
 import random
 
-# ===== AGENT CLASS =====
+#AGENT CLASS
 class Agent:
     def __init__(self, name, role, origin, abilities):
         self.name = name
@@ -11,7 +11,7 @@ class Agent:
         self.origin = origin
         self.abilities = abilities
 
-# ===== QUIZ GAME CLASS =====
+# QUIZ GAME CLASS
 class QuizGame:
     def __init__(self, agents):
         self.agents = agents
@@ -46,15 +46,13 @@ class QuizGame:
         self.score = 0
         self.current_question = 0
         self.generate_questions()
-
-# ===== GUI CLASS =====
 class QuizGUI:
     def __init__(self, root, game):
         self.root = root
         self.game = game
         self.player_name = ""
 
-        # ===== LIGHT MODE ALWAYS =====
+        #LIGHT MODE ALWAYS
         self.bg_color = "#f0f0f0"
         self.fg_color = "#000000"
         self.card_bg = "#ffffff"
@@ -63,7 +61,7 @@ class QuizGUI:
         self.root.geometry("800x600")
         self.root.config(bg=self.bg_color)
 
-        # ----- Welcome Frame -----
+        #Welcome Frame
         self.welcome_frame = tk.Frame(self.root, bg=self.bg_color)
         self.welcome_frame.pack(expand=True)
 
@@ -77,17 +75,17 @@ class QuizGUI:
         tk.Button(self.welcome_frame, text="Start Quiz", font=("Helvetica", 16, "bold"), bg="#FF4655",
                   fg="white", activebackground="#FF7F7F", command=self.start_quiz).pack(pady=20)
 
-        # ----- Quiz Frame -----
+        #Quiz Frame
         self.quiz_frame = tk.Frame(self.root, bg=self.bg_color)
 
-        # Score and progress
+        #Score and progress
         self.score_label = tk.Label(self.quiz_frame, text="Score: 0 / 10", font=("Helvetica", 16, "bold"),
                                     bg=self.bg_color, fg=self.fg_color)
         self.score_label.pack(pady=10)
         self.progress = ttk.Progressbar(self.quiz_frame, length=600, mode='determinate', maximum=10)
         self.progress.pack(pady=10)
 
-        # Question Card
+        #Question Card
         self.card = tk.Frame(self.quiz_frame, bg=self.card_bg, bd=5, relief="ridge")
         self.card.pack(pady=20, ipadx=30, ipady=30)
 
@@ -95,7 +93,7 @@ class QuizGUI:
                                        bg=self.card_bg, fg=self.fg_color)
         self.question_label.pack(pady=20)
 
-        # Multiple-choice buttons
+        #Multiple-choice buttons
         self.option_buttons = []
         for i in range(4):
             btn = tk.Button(self.card, text="", font=("Helvetica", 14), width=30,
@@ -105,7 +103,7 @@ class QuizGUI:
             btn.bind("<Leave>", lambda e, b=btn: b.config(bg=self.card_bg))
             self.option_buttons.append(btn)
 
-    # ----- Start Quiz -----
+    #Start Quiz
     def start_quiz(self):
         name = self.name_entry.get().strip()
         if not name:
@@ -117,7 +115,7 @@ class QuizGUI:
         self.quiz_frame.pack(expand=True)
         self.show_question()
 
-    # ----- Show Question -----
+    #Show Questio
     def show_question(self):
         qdata = self.game.questions[self.game.current_question]
         self.question_label.config(text=f"Q{self.game.current_question + 1}: {qdata['question']}")
@@ -137,7 +135,7 @@ class QuizGUI:
         for idx, btn in enumerate(self.option_buttons):
             btn.config(text=options[idx], bg=self.card_bg, state="normal")
 
-    # ----- Submit Answer -----
+    #Submit Answer
     def submit_answer(self, idx):
         selected = self.option_buttons[idx].cget("text")
         correct = self.game.check_answer(selected)
@@ -151,7 +149,7 @@ class QuizGUI:
                     btn.config(bg="#4CAF50")
         self.root.after(1000, self.next_question)
 
-    # ----- Next Question -----
+    #Next Question
     def next_question(self):
         next_q = self.game.next_question()
         if next_q:
@@ -159,7 +157,7 @@ class QuizGUI:
         else:
             self.end_quiz()
 
-    # ----- End Quiz -----
+    #End Quiz
     def end_quiz(self):
         score = self.game.score
         message = f"Quiz complete, {self.player_name}!\nYour Score: {score} / 10\n"
@@ -172,7 +170,7 @@ class QuizGUI:
         messagebox.showinfo("Quiz Finished", message)
         self.root.destroy()
 
-# ===== AGENTS DATA =====
+#AGENTS DATA
 agents_data = [
     Agent("Brimstone", "Controller", "USA", ["Incendiary", "Stim Beacon", "Sky Smoke", "Orbital Strike"]),
     Agent("Phoenix", "Duelist", "UK", ["Curveball", "Hot Hands", "Blaze", "Run It Back"]),
@@ -200,7 +198,7 @@ agents_data = [
     Agent("Clove", "Controller", "Scotland", ["Pick-Me-Up", "Ruse", "Meddle", "Not Dead Yet"])
 ]
 
-# ===== RUN APP =====
+#RUN APP 
 if __name__ == "__main__":
     root = tk.Tk()
     game = QuizGame(agents_data)
